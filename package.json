@@ -9,11 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.10",
-    "lodash": "^4.17.21",
-    "moment": "^2.29.1",
-    "puppeteer": "^10.1.0",
-    "turndown": "^7.1.1",
-    "uuid": "^8.3.2"
+    "cron": "^1.8.2",
+    "lodash": "4.17.21",
+    "moment": "2.29.1",
+    "puppeteer": "10.1.0",
+    "uuid": "8.3.2"
   }
 }
