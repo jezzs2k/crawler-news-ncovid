@@ -10,7 +10,7 @@ async function extractNews(url) {
     const browser = await puppeteer.launch({
         headless: true,
         waitUntil: 'networkidle2',
-        executablePath: '/usr/bin/google-chrome'
+        // executablePath: '/usr/bin/google-chrome'
     });
     const page = await browser.newPage();
     await page.goto(url);
@@ -116,20 +116,20 @@ const handleCrawlerNews = async () => {
 
 };
 
-const job = new CronJob('30 */1 * * *', async function () {
-    console.log("Run cron new start");
-    console.time('CronStart');
-
-    await handleCrawlerNews();
-    
-    console.timeEnd('CronStart');
-    console.log("Cron run successed");
-    console.log(new Date());
-}, null, true, 'Asia/Ho_Chi_Minh');
-
-
-
 module.exports = async () => {
-    await handleCrawlerNews()
+
+    const job = new CronJob('30 */1 * * *', async function () {
+        console.log("Run cron new start");
+        console.time('CronStart');
+
+        await handleCrawlerNews();
+        
+        console.timeEnd('CronStart');
+        console.log("Cron run successed");
+        console.log(new Date());
+    }, null, true, 'Asia/Ho_Chi_Minh');
+
     job.start();
+
+    await handleCrawlerNews()
 }
