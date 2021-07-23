@@ -1,125 +1,39 @@
-const puppeteer = require('puppeteer');
-const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
-const _ = require('lodash');
-const CronJob = require('cron').CronJob;
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
 
-let pageIndex = 0;
+const crawler = require('./crawler');
 
-async function extractNews(url) {
-    const browser = await puppeteer.launch({
-        headless: true
-    });
-    const page = await browser.newPage();
-    await page.goto(url);
+(async () => await crawler())();
 
-    const nextPage = await page.evaluate(() => {
-        const portletBody = document.querySelector("div.portlet-body");
-        return portletBody.querySelectorAll("div.clearfix.lfr-pagination li")?.[1]?.querySelector('a')?.href
-    })
+app.get('/', (req, res) => {
+  res.send('Hello my friend !')
+})
 
-    const news = await page.evaluate(() => {
-        const portletBody = document.querySelector("div.portlet-body");
+app.get('/news/:page', function (req, res) {
+    const pageIndex = req.params.page;
+    fs.readFile('news.json', 'utf8', function readFileCallback(err, data) {
+        if (err) {
+            return res.send('Error', + JSON.stringify(err))
+        }else {
+            if (data) {
+                const newsFile = JSON.parse(data);
 
-        const headerNew = {
-            image: portletBody.querySelector("img.lazy")?.src,
-            title: portletBody.querySelector("a h2")?.textContent,
-            date: portletBody.querySelector("small.text-muted")?.textContent,
-            content: portletBody.querySelectorAll("p")[1]?.textContent,
-            detail: portletBody.querySelector("a")?.href,
-            id: portletBody.querySelector("a")?.href.split('/-/')?.[1],
-        }
+                if (!newsFile?.news) {
+                    return res.send('News is empty !');
+                }else {
+                    const newsData = newsFile.news;
 
-        const row = portletBody.querySelectorAll("div.row.mb-1");
-
-        return [headerNew, ...Array.from(row).map(r => {
-            return {
-                id: r.querySelector("a.text-tletin")?.href.split('/-/')?.[1],
-                image: r.querySelector("img.lazy")?.src,
-                title: r.querySelector("a.text-tletin")?.textContent,
-                date: r.querySelector("small.text-muted")?.textContent,
-                content: r.querySelector("div.text-muted.d-none p")?.textContent,
-                detail: r.querySelector("a.text-tletin")?.href
-            };
-
-        })];
-    }, JSON.stringify(uuidv4));
-
-    await browser.close();
-
-    return {
-        news,
-        pageIndex: pageIndex++,
-        totalNews: news.length,
-        nextPage,
-    };
-}
-
-const handleCrawlerNews = async () => {
-    console.time("answer time");
-    let crawlerNews = [];
-    let newsss = null;
-    let news = await extractNews('https://ncov.moh.gov.vn/vi/web/guest/tin-tuc');
-
-    crawlerNews = [...crawlerNews, ...news.news]
-
-    while (1) {
-        if (newsss) {
-            crawlerNews = [...crawlerNews, ...newsss.news];
-        }
-
-        console.log(crawlerNews.length);
-
-        if (crawlerNews.length > 300) {
-            fs.readFile('news.json', 'utf8', function readFileCallback(err, data) {
-                if (err) {
-                    console.log(`Error writing file: ${err}`);
-                } else {
-                    let newCrawlerNews = null;
-
-                    if (data) {
-                        const news = JSON.parse(data);
-
-                        if (news && news?.news) {
-                            newCrawlerNews = _.unionBy(news.news, crawlerNews, 'id');
-                        }
-                    }
-
-                    const listNews = JSON.stringify({
-                        news: newCrawlerNews ?? crawlerNews,
-                        pageIndex,
-                        createdAt: new Date().toISOString(),
-                        totalNews: crawlerNews.length
-                    });
-
-                    fs.writeFile('news.json', listNews, 'utf8', (err) => {
-                        if (err) {
-                            console.log(`Error writing file: ${err}`);
-                        } else {
-                            console.log(`File is written successfully!`);
-                        }
-                    });
+                    return res.jsonp(newsData.slice((pageIndex-1)*20, pageIndex*20))
                 }
-            });
-
-            console.timeEnd("answer time");
-            return;
-        } else {
-            newsss = await extractNews(newsss?.nextPage ?? news.nextPage);
+            }else {
+                return res.send('News is empty !');
+            }
         }
+    })
+})
 
-    }
-
-};
-
-(async () => await handleCrawlerNews())();
-
-const job = new CronJob('59 05 * * *', async function () {
-    console.log("Run cron new start");
-    console.time('CronStart');
-    await handleCrawlerNews();
-    console.timeEnd('CronStart');
-    console.log("Cron run successed");
-}, null, true, 'Asia/Ho_Chi_Minh');
-
-job.start();
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})
