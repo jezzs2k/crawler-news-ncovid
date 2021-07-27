@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const _ = require('lodash');
-const CronJob = require('cron').CronJob;
 
 let pageIndex = 0;
 
@@ -71,7 +70,7 @@ const handleCrawlerNews = async () => {
 
         console.log(crawlerNews.length);
 
-        if (crawlerNews.length > 300) {
+        if (crawlerNews.length > 100) {
             fs.readFile('news.json', 'utf8', function readFileCallback(err, data) {
                 if (err) {
                     console.log(`Error writing file: ${err}`);
@@ -107,7 +106,7 @@ const handleCrawlerNews = async () => {
                 }
             });
 
-            return;
+            return crawlerNews;
         } else {
             newsss = await extractNews(newsss?.nextPage ?? news.nextPage);
         }
@@ -117,19 +116,5 @@ const handleCrawlerNews = async () => {
 };
 
 module.exports = async () => {
-
-    const job = new CronJob('30 */1 * * *', async function () {
-        console.log("Run cron new start");
-        console.time('CronStart');
-
-        await handleCrawlerNews();
-        
-        console.timeEnd('CronStart');
-        console.log("Cron run successed");
-        console.log(new Date());
-    }, null, true, 'Asia/Ho_Chi_Minh');
-
-    job.start();
-
-    await handleCrawlerNews()
+    return await handleCrawlerNews()
 }
