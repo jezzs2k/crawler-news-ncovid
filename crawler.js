@@ -74,7 +74,7 @@ const handleCrawlerNews = async () => {
 
         // console.log(crawlerNews.length);
 
-        if (crawlerNews.length > 100) {
+        if (crawlerNews.length > 10) {
             fs.readFile('news.json', 'utf8', function readFileCallback(err, data) {
                 if (err) {
                     // console.log(`Error writing file: ${err}`);
