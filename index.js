@@ -63,44 +63,44 @@ app.get('/news/:page', function (req, res) {
 })
 
 app.listen(port, () => {
-    const job = new CronJob(`${nextMinuteToRunCronjob} ${nextHouseToRunCronjob} * * *`, async function () {
-        console.log("Run cron new start");
-        console.time('CronStart');
+    // const job = new CronJob(`${nextMinuteToRunCronjob} ${nextHouseToRunCronjob} * * *`, async function () {
+    //     console.log("Run cron new start");
+    //     console.time('CronStart');
 
-        const crawlerNews = await crawler();
+    //     const crawlerNews = await crawler();
 
-        const date1 = crawlerNews[0].split(', ');
-        const date2 = crawlerNews[1].split(', ');
+    //     const date1 = crawlerNews[0].split(', ');
+    //     const date2 = crawlerNews[1].split(', ');
 
-        if (date1[0] === date2[0] && date1[1] === date2[1]) {
-            const time1 = date1[2].split(':');
-            const time2 = date2[2].split(':');
+    //     if (date1[0] === date2[0] && date1[1] === date2[1]) {
+    //         const time1 = date1[2].split(':');
+    //         const time2 = date2[2].split(':');
 
-            const minuteRemain1 = 60 - Number(time1[1] ?? 0);
-            const minuteRemain2 = 60 - Number(time2[1] ?? 0);
+    //         const minuteRemain1 = 60 - Number(time1[1] ?? 0);
+    //         const minuteRemain2 = 60 - Number(time2[1] ?? 0);
 
-            const house1 = Number(time1[0]);
-            const house2 = Number(time2[0]);
+    //         const house1 = Number(time1[0]);
+    //         const house2 = Number(time2[0]);
 
-            if (house1 === house2) {
-                nextMinuteToRunCronjob = minuteRemain1 - minuteRemain2;
-                nextHouseToRunCronjob = house1;
-            } else if (house1 > house2) {
-                nextHouseToRunCronjob = nextHouseToRunCronjob + house1 - house2;
-                nextMinuteToRunCronjob = minuteRemain2 + minuteRemain1;
-            } else if (nextHouseToRunCronjob > 22) {
-                nextMinuteToRunCronjob = 30;
-                nextHouseToRunCronjob = 8;
-            }
+    //         if (house1 === house2) {
+    //             nextMinuteToRunCronjob = minuteRemain1 - minuteRemain2;
+    //             nextHouseToRunCronjob = house1;
+    //         } else if (house1 > house2) {
+    //             nextHouseToRunCronjob = nextHouseToRunCronjob + house1 - house2;
+    //             nextMinuteToRunCronjob = minuteRemain2 + minuteRemain1;
+    //         } else if (nextHouseToRunCronjob > 22) {
+    //             nextMinuteToRunCronjob = 30;
+    //             nextHouseToRunCronjob = 8;
+    //         }
 
-        }
+    //     }
 
-        console.timeEnd('CronStart');
-        console.log("Cron run successed");
-        console.log(new Date());
-    }, null, true, 'Asia/Ho_Chi_Minh');
+    //     console.timeEnd('CronStart');
+    //     console.log("Cron run successed");
+    //     console.log(new Date());
+    // }, null, true, 'Asia/Ho_Chi_Minh');
 
-    job.start();
+    // job.start();
 
     console.log(`Example app listening at http://localhost:${port}`)
 })
