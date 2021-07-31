@@ -5,6 +5,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const crawler = require('./crawler');
+const wakeUpDynp = require('./wakeUpDyno');
+
+const URL = 'https://crawler-news-ncov.herokuapp.com/';
 
 let nextHouseToRunCronjob = 8;
 let nextMinuteToRunCronjob = 8;
@@ -101,6 +104,6 @@ app.listen(port, () => {
     // }, null, true, 'Asia/Ho_Chi_Minh');
 
     // job.start();
-
-    console.log(`Example app listening at http://localhost:${port}`)
+    wakeUpDynp(URL, 29);
+    console.log(`App listening at http://localhost:${port}`)
 })

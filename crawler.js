@@ -60,7 +60,7 @@ async function extractNews(url) {
     };
 }
 
-const handleCrawlerNews = async () => {
+const handleCrawlerNews = async (page = 10) => {
     let crawlerNews = [];
     let newsss = null;
     let news = await extractNews('https://ncov.moh.gov.vn/vi/web/guest/tin-tuc');
@@ -74,7 +74,7 @@ const handleCrawlerNews = async () => {
 
         // console.log(crawlerNews.length);
 
-        if (crawlerNews.length > 10) {
+        if (crawlerNews.length > page) {
             fs.readFile('news.json', 'utf8', function readFileCallback(err, data) {
                 if (err) {
                     // console.log(`Error writing file: ${err}`);
@@ -119,6 +119,6 @@ const handleCrawlerNews = async () => {
 
 };
 
-module.exports = async () => {
-    return await handleCrawlerNews()
+module.exports = async (page) => {
+    return await handleCrawlerNews(page)
 }
