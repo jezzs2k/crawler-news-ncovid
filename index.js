@@ -65,7 +65,7 @@ app.get('/news/:page', function (req, res) {
     })
 })
 
-app.listen(port, () => {
+app.listen(port, async () => {
     // const job = new CronJob(`${nextMinuteToRunCronjob} ${nextHouseToRunCronjob} * * *`, async function () {
     //     console.log("Run cron new start");
     //     console.time('CronStart');
@@ -104,6 +104,6 @@ app.listen(port, () => {
     // }, null, true, 'Asia/Ho_Chi_Minh');
 
     // job.start();
-    wakeUpDynp(URL, 29);
     console.log(`App listening at http://localhost:${port}`)
+    await wakeUpDynp(URL, 25);
 })

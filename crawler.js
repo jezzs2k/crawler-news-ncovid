@@ -60,7 +60,7 @@ async function extractNews(url) {
     };
 }
 
-const handleCrawlerNews = async (page = 10) => {
+const handleCrawlerNews = async (page = 9) => {
     let crawlerNews = [];
     let newsss = null;
     let news = await extractNews('https://ncov.moh.gov.vn/vi/web/guest/tin-tuc');

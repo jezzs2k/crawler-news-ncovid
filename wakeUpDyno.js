@@ -1,14 +1,15 @@
 const fetch = require("node-fetch");
 const crawler = require('./crawler');
 
-const wakeUpDyno = async (url, interval) => {
+const wakeUpDyno = (url, interval) => {
     try {
         const milliseconds = interval * 60000;
-        setTimeout(() => {
+        setTimeout(async () => {
             fetch(url);
+
+            await crawler(4);
         }, milliseconds);
 
-        await crawler(5);
     } catch (error) {
         console.log(error);
     }
