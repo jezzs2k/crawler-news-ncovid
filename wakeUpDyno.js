@@ -4,11 +4,19 @@ const crawler = require('./crawler');
 const wakeUpDyno = (url, interval) => {
     try {
         const milliseconds = interval * 60000;
-        setTimeout(async () => {
+
+        console.log('Time', new Date().getMinutes())
+
+        setTimeout(() => {
+            console.log('Time', new Date().getMinutes())
+
+            crawler(4);
+
             fetch(url);
 
-            await crawler(4);
+            wakeUpDyno(url, interval);
         }, milliseconds);
+
 
     } catch (error) {
         console.log(error);

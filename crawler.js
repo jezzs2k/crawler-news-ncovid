@@ -72,12 +72,10 @@ const handleCrawlerNews = async (page = 9) => {
             crawlerNews = [...crawlerNews, ...newsss.news];
         }
 
-        // console.log(crawlerNews.length);
-
         if (crawlerNews.length > page) {
             fs.readFile('news.json', 'utf8', function readFileCallback(err, data) {
                 if (err) {
-                    // console.log(`Error writing file: ${err}`);
+                    console.log(`Error writing file: ${err}`);
                 } else {
                     let newCrawlerNews = null;
 
@@ -102,9 +100,9 @@ const handleCrawlerNews = async (page = 9) => {
 
                     fs.writeFile('news.json', listNews, 'utf8', (err) => {
                         if (err) {
-                            // console.log(`Error writing file: ${err}`);
+                            console.log(`Error writing file: ${err}`);
                         } else {
-                            // console.log(`File is written successfully!`);
+                            console.log(`File is written successfully!`);
                         }
                     });
                 }
