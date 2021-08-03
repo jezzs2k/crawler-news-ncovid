@@ -3,6 +3,9 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const _ = require('lodash');
 
+const { PushNotifier } = require('./PushNotification');
+const pushNotifier = new PushNotifier();
+
 let pageIndex = 0;
 
 async function extractNews(url) {
@@ -84,6 +87,12 @@ const handleCrawlerNews = async (page = 9) => {
 
                         if (newsFile?.news?.length > 10000) {
                             newsFile.news = [];
+                        }
+
+                        if (!newsFile.news[0] || (newsFile.news[0] && crawlerNews[0] && crawlerNews[0].date !== newsFile.news[0].date)) {
+                            pushNotifier.sendNotificationToDeviceIOS({
+                                content: crawlerNews[0].content,
+                            });
                         }
 
                         if (newsFile && newsFile?.news) {
