@@ -2,9 +2,12 @@ const puppeteer = require('puppeteer');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const _ = require('lodash');
+const fetch = require("node-fetch");
 
 const { PushNotifier } = require('./PushNotification');
 const pushNotifier = new PushNotifier();
+
+const URL_API = "https://crawl-new-api.herokuapp.com/";
 
 let pageIndex = 0;
 
@@ -89,6 +92,28 @@ const handleCrawlerNews = async (page = 9) => {
                             newsFile.news = [];
                         }
 
+                        const totalId1 = crawlerNews[0].id?.split('-')?.reduce((s, b) => {
+                            return s + Number(b)
+                        }, 0);
+                        const totalId2 = newsFile?.news[0]?.id?.split('-')?.reduce((s, b) => {
+                            return s + Number(b)
+                        }, 0);
+
+                        if (newsFile.news[0] && crawlerNews[0] && crawlerNews[0].date !== newsFile.news[0].date && totalId1 && totalId2 && totalId2 < totalId1) {
+                            const jsonNews = JSON.stringify(JSON.stringify(crawlerNews));
+
+                            const body = {
+                                "query": `mutation{createNews(news: ${jsonNews} ){message} }`
+                            };
+
+                            fetch('https://crawl-new-api.herokuapp.com/', {
+                                method: 'post',
+                                body: JSON.stringify(body),
+                                headers: { 'Content-Type': 'application/json' },
+                            }).then(res => res.json())
+                                .then(json => console.log(json));
+                        }
+
                         if (!newsFile.news[0] || (newsFile.news[0] && crawlerNews[0] && crawlerNews[0].date !== newsFile.news[0].date)) {
                             pushNotifier.sendNotificationToDeviceIOS({
                                 content: crawlerNews[0].content,
@@ -99,6 +124,8 @@ const handleCrawlerNews = async (page = 9) => {
                             newCrawlerNews = _.unionBy(crawlerNews, newsFile.news, 'id');
                         }
                     }
+
+
 
                     const listNews = JSON.stringify({
                         news: newCrawlerNews ?? crawlerNews,
