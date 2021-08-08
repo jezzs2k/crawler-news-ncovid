@@ -4,11 +4,6 @@ const fs = require('fs');
 const _ = require('lodash');
 const fetch = require("node-fetch");
 
-const { PushNotifier } = require('./PushNotification');
-const pushNotifier = new PushNotifier();
-
-const URL_API = "https://crawl-new-api.herokuapp.com/";
-
 let pageIndex = 0;
 
 async function extractNews(url) {
@@ -112,12 +107,6 @@ const handleCrawlerNews = async (page = 9) => {
                                 headers: { 'Content-Type': 'application/json' },
                             }).then(res => res.json())
                                 .then(json => console.log(json));
-                        }
-
-                        if (!newsFile.news[0] || (newsFile.news[0] && crawlerNews[0] && crawlerNews[0].date !== newsFile.news[0].date)) {
-                            pushNotifier.sendNotificationToDeviceIOS({
-                                content: crawlerNews[0].content,
-                            });
                         }
 
                         if (newsFile && newsFile?.news) {
