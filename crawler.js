@@ -38,14 +38,14 @@ async function extractNews(url) {
             date: portletBody.querySelector("small.text-muted")?.textContent,
             content: portletBody.querySelectorAll("p")[1]?.textContent,
             detail: portletBody.querySelector("a")?.href,
-            id: portletBody.querySelector("a")?.href.split('/-/')?.[1],
+            newId: portletBody.querySelector("a")?.href.split('/-/')?.[1],
         }
 
         const row = portletBody.querySelectorAll("div.row.mb-1");
 
         return [headerNew, ...Array.from(row).map(r => {
             return {
-                id: r.querySelector("a.text-tletin")?.href.split('/-/')?.[1],
+                newId: r.querySelector("a.text-tletin")?.href.split('/-/')?.[1],
                 image: r.querySelector("img.lazy")?.src,
                 title: r.querySelector("a.text-tletin")?.textContent,
                 date: r.querySelector("small.text-muted")?.textContent,
@@ -92,10 +92,10 @@ const handleCrawlerNews = async (page = 9) => {
                             newsFile.news = [];
                         }
 
-                        const totalId1 = crawlerNews[0].id?.split('-')?.reduce((s, b) => {
+                        const totalId1 = crawlerNews[0].newId?.split('-')?.reduce((s, b) => {
                             return s + Number(b)
                         }, 0);
-                        const totalId2 = newsFile?.news[0]?.id?.split('-')?.reduce((s, b) => {
+                        const totalId2 = newsFile?.news[0]?.newId?.split('-')?.reduce((s, b) => {
                             return s + Number(b)
                         }, 0);
 
@@ -121,7 +121,7 @@ const handleCrawlerNews = async (page = 9) => {
                         }
 
                         if (newsFile && newsFile?.news) {
-                            newCrawlerNews = _.unionBy(crawlerNews, newsFile.news, 'id');
+                            newCrawlerNews = _.unionBy(crawlerNews, newsFile.news, 'newId');
                         }
                     }
 
