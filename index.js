@@ -4,9 +4,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const crawler = require('./crawler');
-const wakeUpDynp = require('./wakeUpDyno');
+// const wakeUpDynp = require('./wakeUpDyno');
 
-const URL = 'https://crawler-news-ncov.herokuapp.com/';
+// const URL = 'https://crawler-news-ncov.herokuapp.com/';
 
 (async () => await crawler())();
 
@@ -63,5 +63,5 @@ app.get('/news/:page', function (req, res) {
 
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`)
-    wakeUpDynp(URL, 25);
+    // wakeUpDynp(URL, 25);
 })
