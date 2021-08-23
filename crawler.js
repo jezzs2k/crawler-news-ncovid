@@ -76,27 +76,28 @@ const handleCrawlerNews = async (page = 9) => {
         }
 
         if (crawlerNews.length > page) {
-            fs.readFile('news.json', 'utf8', function readFileCallback(err, data) {
-                if (err) {
-                    console.log(`Error writing file: ${err}`);
-                } else {
-                    let newCrawlerNews = null;
+            const body = {
+                "query": `query{getNews(pageIndex: "1" ){ date  newId} }`
+            };
+            //http://localhost:5001/
+            fetch('http://crawler-news-covid:5000/', {
+                method: 'post',
+                body: JSON.stringify(body),
+                headers: { 'Content-Type': 'application/json' },
+            }).then(res => res.json())
+                .then(json => {
+                    const data = json.data.getNews;
 
-                    if (data) {
-                        const newsFile = JSON.parse(data);
-
-                        if (newsFile?.news?.length > 10000) {
-                            newsFile.news = [];
-                        }
-
+                    if (data && data?.length > 0) {
+                        console.log(data);
                         const totalId1 = crawlerNews[0].newId?.split('-')?.reduce((s, b) => {
                             return s + Number(b)
                         }, 0);
-                        const totalId2 = newsFile?.news[0]?.newId?.split('-')?.reduce((s, b) => {
+                        const totalId2 = data?.[0]?.newId?.split('-')?.reduce((s, b) => {
                             return s + Number(b)
                         }, 0);
 
-                        if (newsFile.news[0] && crawlerNews[0] && crawlerNews[0].date !== newsFile.news[0].date && totalId1 && totalId2 && totalId2 < totalId1) {
+                        if (data[0] && crawlerNews[0] && crawlerNews[0].date !== data[0].date && totalId1 && totalId2 && totalId2 < totalId1) {
                             const jsonNews = JSON.stringify(JSON.stringify(crawlerNews));
 
                             const body = {
@@ -110,30 +111,22 @@ const handleCrawlerNews = async (page = 9) => {
                             }).then(res => res.json())
                                 .then(json => console.log(json));
                         }
+                    } else {
+                        const jsonNews = JSON.stringify(JSON.stringify(crawlerNews));
+                        const body = {
+                            "query": `mutation{createNews(news: ${jsonNews} ){message} }`
+                        };
 
-                        if (newsFile && newsFile?.news) {
-                            newCrawlerNews = _.unionBy(crawlerNews, newsFile.news, 'newId');
-                        }
+                        fetch('http://crawler-news-covid:5000/', {
+                            method: 'post',
+                            body: JSON.stringify(body),
+                            headers: { 'Content-Type': 'application/json' },
+                        }).then(res => res.json())
+                            .then(json => console.log(json));
                     }
 
+                });
 
-
-                    const listNews = JSON.stringify({
-                        news: newCrawlerNews ?? crawlerNews,
-                        pageIndex,
-                        createdAt: new Date().toISOString(),
-                        totalNews: crawlerNews.length
-                    });
-
-                    fs.writeFile('news.json', listNews, 'utf8', (err) => {
-                        if (err) {
-                            console.log(`Error writing file: ${err}`);
-                        } else {
-                            console.log(`File is written successfully!`);
-                        }
-                    });
-                }
-            });
 
             return crawlerNews;
         } else {

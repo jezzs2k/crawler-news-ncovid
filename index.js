@@ -1,12 +1,12 @@
 const fs = require('fs');
 const express = require('express');
+const fetch = require("node-fetch");
+
 const app = express();
 const port = process.env.PORT || 3000;
 
 const crawler = require('./crawler');
-// const wakeUpDynp = require('./wakeUpDyno');
-
-// const URL = 'https://crawler-news-ncov.herokuapp.com/';
+const CreateJob = require('./jobCron');
 
 (async () => await crawler())();
 
@@ -62,6 +62,13 @@ app.get('/news/:page', function (req, res) {
 })
 
 app.listen(port, () => {
+    CreateJob('0 * * * *', async () => {
+        try {
+            fetch('http://crawler-news-covid-2/ca');
+            await crawler();
+        } catch (error) {
+            console.log(error);
+        }
+    })
     console.log(`App listening at http://localhost:${port}`)
-    // wakeUpDynp(URL, 25);
 })
