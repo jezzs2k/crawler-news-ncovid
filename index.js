@@ -64,7 +64,7 @@ app.get('/news/:page', function (req, res) {
 app.listen(port, () => {
     CreateJob('0 * * * *', async () => {
         try {
-            fetch('http://crawler-news-covid-2/ca');
+            fetch('http://crawler-news-covid-2:3001/ca');
             await crawler();
         } catch (error) {
             console.log(error);
